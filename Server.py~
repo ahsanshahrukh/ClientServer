@@ -1,0 +1,81 @@
+
+# first of all import the socket library 
+import socket
+import json, pickle
+import os, sys           
+  
+
+#merge sort
+def mergeSort(arr): 
+    if len(arr) >1: 
+        mid = len(arr)//2 #Finding the mid of the array 
+        L = arr[:mid] # Dividing the array elements  
+        R = arr[mid:] # into 2 halves 
+  
+        mergeSort(L) # Sorting the first half 
+        mergeSort(R) # Sorting the second half 
+  
+        i = j = k = 0
+          
+        # Copy data to temp arrays L[] and R[] 
+        while i < len(L) and j < len(R): 
+            if L[i] < R[j]: 
+                arr[k] = L[i] 
+                i+=1
+            else: 
+                arr[k] = R[j] 
+                j+=1
+            k+=1
+          
+        # Checking if any element was left 
+        while i < len(L): 
+            arr[k] = L[i] 
+            i+=1
+            k+=1
+          
+        while j < len(R): 
+            arr[k] = R[j] 
+            j+=1
+            k+=1
+    return arr   	
+
+
+s = socket.socket()          
+print "Socket has been Created successfully"
+              
+port = int(sys.argv[1])
+s.bind(('', port))         
+print " binded to port no :%s" port %(port) 
+
+s.listen(10) #Listening maximum of 10 clients.     
+print "socket is listening"            
+
+while True:  
+	c, addr = s.accept()      
+	print 'Got connection from', addr 
+	pid=os.fork()
+	if (pid)==0:
+		print "New child created for client request"
+		s.close()
+		# send a thank you message to the client.  
+		#Echo code
+		while True:
+			data = c.recv(1024)
+			sortingArray=[]
+			for item in data.split(","):
+				sortingArray.append(item)
+			sorted = mergeSort(sortingArray)
+			if not data:
+				break
+			c.send(json.dumps(sorted))
+		os. _exit(0)
+	else
+		print "Cannot create more clients "
+		break
+	
+	
+# Close the connection with the client 
+c.close()
+
+
+
